@@ -208,3 +208,5 @@ Phase 2 overnight summary (STOPPED early; persist WP resumed)
 - `./bin/dev test` → 15 passed; `./bin/dev lint` → ok; full `check`/smoke not run this cycle
 
 **Pass/fail delta:** T3 api-simple = **pass**.
+
+- api-simple T1–T12 evidence: see `docs/PHASE2_EVIDENCE_api-simple.md` (branch `phase2/api-simple-matrix`).
