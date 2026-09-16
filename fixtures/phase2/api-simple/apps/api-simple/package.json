@@ -1,0 +1,8 @@
+{
+  "name": "api-simple",
+  "private": true,
+  "scripts": {
+    "build": "bun build.ts",
+    "start": "bun server.ts"
+  }
+}

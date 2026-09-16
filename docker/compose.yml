@@ -1,0 +1,52 @@
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ..:/app:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - php-fpm-socket:/var/run
+    networks:
+      - jit-private
+    depends_on:
+      - gateway
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: fpm
+    volumes:
+      - ..:/app
+      - jit-state:/var/jit-state
+      - php-fpm-socket:/var/run
+    environment:
+      JIT_WORKSPACE: /app
+      JIT_CONFIG: /app/config/services.php
+      JIT_STATE_DIR: /var/jit-state
+    networks:
+      - jit-private
+
+  supervisor:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: cli
+    volumes:
+      - ..:/app
+      - jit-state:/var/jit-state
+    environment:
+      JIT_WORKSPACE: /app
+      JIT_CONFIG: /app/config/services.php
+      JIT_STATE_DIR: /var/jit-state
+    networks:
+      - jit-private
+
+networks:
+  jit-private:
+    internal: false
+
+volumes:
+  jit-state:
+  php-fpm-socket:

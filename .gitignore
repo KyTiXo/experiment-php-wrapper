@@ -1,0 +1,13 @@
+/vendor/
+/node_modules/
+/dist/
+/.php-cs-fixer.cache
+/var/
+/smoke/work/
+.env
+.env.*
+!.env.example
+*.log
+*.pem
+credentials.json
+.DS_Store

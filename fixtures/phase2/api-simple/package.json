@@ -1,0 +1,9 @@
+{
+  "name": "api-simple-monorepo",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "build": "bun run --cwd apps/api-simple build",
+    "start": "bun run --cwd apps/api-simple start"
+  }
+}

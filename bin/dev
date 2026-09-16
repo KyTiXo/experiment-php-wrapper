@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+COMPOSE="docker compose -f docker/compose.yml"
+CSFIXER="${ROOT}/tools/php-cs-fixer.phar"
+USE_DOCKER="${JIT_USE_DOCKER:-auto}"
+
+docker_ok() {
+  docker compose -f docker/compose.yml config -q >/dev/null 2>&1 \
+    && docker compose -f docker/compose.yml run --rm --no-deps supervisor true >/dev/null 2>&1
+}
+
+if [[ "$USE_DOCKER" == "auto" ]]; then
+  if docker_ok; then
+    USE_DOCKER=1
+  else
+    USE_DOCKER=0
+  fi
+fi
+
+run_php() {
+  if [[ "$USE_DOCKER" == "1" ]]; then
+    docker compose -f docker/compose.yml run --rm --no-deps supervisor php "$@"
+  else
+    php "$@"
+  fi
+}
+
+run_csfixer() {
+  local extra=("$@")
+  if [[ "$USE_DOCKER" == "1" ]]; then
+    docker compose -f docker/compose.yml run --rm --no-deps supervisor \
+      /usr/local/bin/php-cs-fixer "${extra[@]}"
+  else
+    if [[ ! -f "$CSFIXER" ]]; then
+      mkdir -p "${ROOT}/tools"
+      curl -fsSL -o "$CSFIXER" \
+        https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/v3.95.25/php-cs-fixer.phar
+    fi
+    php "$CSFIXER" "${extra[@]}"
+  fi
+}
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  format)
+    run_csfixer fix --config=.php-cs-fixer.dist.php --allow-risky=yes
+    ;;
+  lint)
+    echo "== PHP syntax =="
+    while IFS= read -r -d '' f; do
+      run_php -l "$f" >/dev/null
+    done < <(find src tests public supervisor -name '*.php' -print0)
+    echo "== PHP-CS-Fixer dry-run =="
+    run_csfixer fix --config=.php-cs-fixer.dist.php --dry-run --diff --allow-risky=yes
+    echo "== Shell syntax =="
+    bash -n bin/dev
+    bash -n smoke/run.sh
+    echo "== Compose validate =="
+    $COMPOSE config -q
+    echo "lint ok"
+    ;;
+  test)
+    run_php tests/run.php "$@"
+    ;;
+  smoke)
+    bash smoke/run.sh
+    ;;
+  check)
+    "$0" lint
+    "$0" test
+    "$0" smoke
+    echo "check ok"
+    ;;
+  *)
+    echo "Usage: $0 {format|lint|test|smoke|check}"
+    exit 1
+    ;;
+esac
