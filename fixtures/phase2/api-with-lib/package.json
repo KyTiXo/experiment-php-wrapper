@@ -1,0 +1,9 @@
+{
+  "name": "api-with-lib-monorepo",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "build": "bun run --cwd apps/api-with-lib build",
+    "start": "bun run --cwd apps/api-with-lib start"
+  }
+}

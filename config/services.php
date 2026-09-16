@@ -34,5 +34,22 @@ return [
             'envPrivate' => [],
             'readyPath' => '/health',
         ],
+        'api-with-lib' => [
+            'dir' => 'fixtures/phase2/api-with-lib',
+            'port' => 4102,
+            'commands' => [
+                'build' => ['bun', 'run', 'build'],
+                'start' => ['bun', 'run', 'start'],
+            ],
+            'watch' => [
+                'fixtures/phase2/api-with-lib/packages/shared-lib',
+                'fixtures/phase2/api-with-lib/apps/api-with-lib',
+            ],
+            'envPublic' => [
+                'PORT' => '4102',
+            ],
+            'envPrivate' => [],
+            'readyPath' => '/health',
+        ],
     ],
 ];

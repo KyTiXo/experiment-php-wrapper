@@ -102,8 +102,10 @@ final class Application
 
     private function isLocalRequest(): bool
     {
+        // Allow any port on loopback (php -S host gateways use :8091 etc., not only :8080).
         $host = strtolower($_SERVER['HTTP_HOST'] ?? 'localhost');
-        if (!in_array($host, ['localhost', '127.0.0.1', 'localhost:8080', '127.0.0.1:8080'], true)) {
+        $hostOnly = explode(':', $host, 2)[0];
+        if (!in_array($hostOnly, ['localhost', '127.0.0.1'], true)) {
             return false;
         }
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
