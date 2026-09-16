@@ -263,3 +263,19 @@ Phase 2 overnight summary (STOPPED early; persist WP resumed)
 **Pass/fail delta:** T3 api-simple = **pass**.
 
 - api-simple T1–T12 evidence: see `docs/PHASE2_EVIDENCE_api-simple.md` (branch `phase2/api-simple-matrix`).
+
+### Cycle 11 — Bugbot fixes (duplicate spawn + IPv6 Origin)
+
+**Goal:** Address two Bugbot findings on Phase 2 master.
+
+**Finding 1 (HIGH) — duplicate child after rehydrate:**
+`startIfNeeded` only called `stopProcess` when fingerprint differed. After `rehydrateFromDisk` adopted a matching-fp PID, a failed readiness check fell through and spawned a second persistent child → duplicate processes + `runtime.json` pointing only at the new PID.
+
+**Fix:** If any in-memory/adopted process remains after the matching-fp readiness short-circuit fails (or fingerprint differs), stop it before rebuild/start. Same path covers both cases; `stopProcess` clears `runtime.json`.
+
+**Finding 2 (MEDIUM) — IPv6 Origin gate:**
+Host allowlist already included `[::1]`, but Origin only accepted `127.0.0.1` / `localhost`. Browser `Origin: http://[::1]:port` → DevApi 403.
+
+**Fix:** Treat `[::1]` / `::1` as local in the Origin check.
+
+**Verify:** `JIT_USE_DOCKER=0 ./bin/dev test` → 15 passed, 0 failed. Duplicate-spawn path covered by code-path reasoning (rehydrate + failed readiness → stop before spawn); no new harness added.

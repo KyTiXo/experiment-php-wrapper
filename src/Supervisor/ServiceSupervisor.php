@@ -190,7 +190,9 @@ final class ServiceSupervisor
             }
         }
 
-        if ($this->process !== null && $this->runningFingerprint !== $fingerprint) {
+        // Stop before spawn: fingerprint mismatch, or matching-fp adopt whose readiness failed
+        // (otherwise a second child starts and runtime.json points at the new PID only).
+        if ($this->process !== null) {
             $this->stopProcess();
         }
 

@@ -109,7 +109,12 @@ final class Application
             return false;
         }
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-        if ($origin !== '' && !str_contains($origin, '127.0.0.1') && !str_contains($origin, 'localhost')) {
+        if ($origin !== ''
+            && !str_contains($origin, '127.0.0.1')
+            && !str_contains($origin, 'localhost')
+            && !str_contains($origin, '[::1]')
+            && !str_contains($origin, '::1')
+        ) {
             return false;
         }
 
