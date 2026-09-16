@@ -2,15 +2,28 @@
 
 Orchestrator session for mock Nest-style monorepos + T1–T12 matrix.
 
+**Reconcile:** 2026-09-16 overnight merge of `phase2/api-simple-matrix`, `phase2/api-with-lib-matrix`, `phase2/api-private-matrix` into `master` (init `2c54374`).
+
 ## Directory plan
 
 | Mock | Path | Port | Notes |
 |------|------|------|-------|
+| fixture (baseline) | `fixtures/bun-service` | 4100 | existing |
 | A api-simple | `fixtures/phase2/api-simple` | 4101 | `/health`, `/api/v1/ping`, `/echo` |
 | B api-with-lib | `fixtures/phase2/api-with-lib` | 4102 | shared-lib + app watch |
 | C api-private | `fixtures/phase2/api-private-env` | 4103 | `envPrivate` DATABASE_URL |
+| T12 throwaway | `fixtures/phase2/api-tcp-probe` | 4104 | **no** `readyPath` (TCP-only) |
 
-Existing `fixture` keeps port **4100**.
+## Final summary
+
+Phase 2 matrix runs completed in three isolated worktrees and merged to `master`. Router fixes required for host `php -S` gateways: SupervisorPool ctor wiring, `buildMs` cast, `curl_close` omit, `runtime.json` persist/rehydrate + adopted-PID stop, and `isLocalRequest()` any local port (`[::1]` included).
+
+Evidence:
+- `docs/PHASE2_EVIDENCE_api-simple.md` — 11 pass + T12 N/A
+- `docs/PHASE2_EVIDENCE_api-with-lib.md` — T1–T7,T9–T11 pass; T8/T12 N/A; T4 needs content edit (not pure touch)
+- `docs/PHASE2_EVIDENCE_api-private.md` + `docs/evidence-api-private/` — 12/12 pass (T12 via `api-tcp-probe`)
+
+Docker Compose skipped throughout (workspace path contains spaces → bind-mount fails). Host gateway + `JIT_USE_DOCKER=0 ./bin/dev test` used instead.
 
 ## Cycle summary
 
@@ -22,25 +35,64 @@ Existing `fixture` keeps port **4100**.
 | 4 | Remove curl_close (PHP 8.5) | T2 clean; T3 fail | skipped | Interrupted by STOP; body clean; warm still X-Dev-Cold-Start:1 (rebuild) |
 | 5 | Scaffold fixtures B+C + register | local smoke | skipped | api-with-lib 4102 + api-private 4103; api-simple hook for T8; no gateway matrix |
 | 6 | WP-supervisor-persist (disk PID/fp) | T3 pass; unit 15/15 | lint ok (no smoke) | runtime.json adopt; warm Cold-Start:0; Docker skipped (path spaces) |
+| 7 | Matrix api-simple (worktree) | T1–T11 pass; T12 N/A | skipped | T9 `isLocalRequest` hostname-only fix; evidence doc |
+| 8 | Matrix api-with-lib (worktree) | T1–T7,T9–T11 pass; T8/T12 N/A | skipped | T4 content-hash note; evidence doc |
+| 9 | Matrix api-private (worktree) | 12/12 pass | skipped | T12 via throwaway `api-tcp-probe` :4104; curl dumps |
+| 10 | Overnight reconcile → master | merge + unit 15/15 | host test only | Merged simple→with-lib→private; keep all evidence; services 4100–4104; Docker skipped (path spaces) |
 
-
-## Pass/fail matrix
+## Pass/fail matrix (final)
 
 | Test | api-simple | api-with-lib | api-private |
 |------|------------|--------------|-------------|
-| T1   | pending    | pending      | **PASS**    |
-| T2   | pending    | pending      | **PASS**    |
-| T3   | pending    | pending      | **PASS**    |
-| T4   | pending    | pending      | **PASS**    |
-| T5   | pending    | pending      | **PASS**    |
-| T6   | pending    | pending      | **PASS**    |
-| T7   | pending    | pending      | **PASS**    |
-| T8   | pending    | pending      | **PASS**    |
-| T9   | pending    | pending      | **PASS**    |
-| T10  | pending    | pending      | **PASS**    |
-| T11  | pending    | pending      | **PASS**    |
-| T12  | pending    | pending      | **PASS** (via throwaway `api-tcp-probe`) |
+| T1   | pass       | pass         | pass        |
+| T2   | pass       | pass         | pass        |
+| T3   | pass       | pass         | pass        |
+| T4   | pass       | pass†        | pass        |
+| T5   | pass       | pass         | pass        |
+| T6   | pass       | pass         | pass        |
+| T7   | pass       | pass         | pass        |
+| T8   | pass       | N/A          | pass        |
+| T9   | pass       | pass         | pass        |
+| T10  | pass       | pass         | pass        |
+| T11  | pass       | pass         | pass        |
+| T12  | N/A        | N/A          | pass‡       |
 
+† T4 on api-with-lib: content edit under `packages/shared-lib` dirties fingerprint; pure `touch` does not (content-hash by design).  
+‡ T12 exercised via throwaway `api-tcp-probe` (port 4104, no `readyPath`), not api-private itself. api-simple / api-with-lib keep `readyPath` → T12 N/A.
+
+## Remaining gaps
+
+- Docker Desktop bind-mount fails when workspace path contains spaces; no `JIT_USE_DOCKER=1` evidence on this machine.
+- Nginx gateway / Compose path not re-verified after matrix (host `php -S` only).
+- SSE under single-threaded `php -S` cannot build+stream concurrently (T1 boot page still embeds EventSource; curl SSE alone may return 0 bytes).
+- `api-with-lib` has no T8 hook registered (intentional N/A).
+- T12 coverage is throwaway service; production services still use HTTP `readyPath`.
+- Watch/fingerprint: mtime-only touch insufficient — operators must change file content for dirty rebuild demos.
+- Real Nest `nest build` layout vs mock `dist/` still unproven.
+- Process group / `setsid` termination still deferred (adopted PID stop is SIGTERM/SIGKILL on single PID).
+
+## Suggested Phase 3
+
+- Real NestJS apps with `nest start` / SWC build against the same supervisor.
+- Process group termination (`setsid`) so child trees die with the service.
+- CI job: `JIT_USE_DOCKER=1 ./bin/dev check` on Linux (path without spaces).
+- Optional: tarball fingerprint mode; richer dirty/stale UX.
+- Decide fate of throwaway `api-tcp-probe` (keep for TCP readiness regression or remove).
+- Symlink / relocate workspace to a spaceless path if Docker Compose evidence is required.
+
+## Handoff block (for next human session)
+
+1. **Status — yellow/green:** Matrix evidence green across three services (T8/T12 N/A where applicable; private 12/12 including TCP probe). Host `JIT_USE_DOCKER=0 ./bin/dev test` → **15 passed, 0 failed**. Docker Compose / full `./bin/dev check` with Docker **not** green on this Mac path (spaces). Review agent (Bugbot) not run by reconcile — parent launches separately.
+2. **Artifacts**
+   - Mocks: `fixtures/phase2/{api-simple,api-with-lib,api-private-env,api-tcp-probe}`
+   - Evidence: `docs/PHASE2_EVIDENCE_api-{simple,with-lib,private}.md`, dumps `docs/evidence-api-private/`
+   - Log: `docs/PHASE2_CYCLE_LOG.md` (this file)
+   - Config: `config/services.php` ports 4100–4104; hooks for fixture, api-simple, api-private
+   - Router: `Application::isLocalRequest`, `ServiceSupervisor` runtime.json, `ProcessRunner` adopted PID stop, `HttpProxy` curl_close omit, `SupervisorPool` ctor, `buildMs` casts
+3. **Action list (max 3)**
+   1. Human review of merged router patch + evidence docs (or let parent Bugbot run).
+   2. Confirm `JIT_DATABASE_URL` policy for local/Compose (fake URL only; never commit `.env`).
+   3. Cleanup worktrees when ready: `/delete-worktree` for `phase2-simple-bfdfb8aa`, `phase2-lib-f5112be3`, `api-private-c5e8bbf2` (reconcile left them intact).
 
 ---
 
