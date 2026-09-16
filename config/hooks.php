@@ -10,4 +10,10 @@ return static function (HookRegistry $hooks): void {
 
         return $headers;
     }, priority: 10);
+
+    $hooks->register('service.api-simple.request.headers', static function (array $headers): array {
+        $headers['X-Fixture-Hook'] = ['1'];
+
+        return $headers;
+    }, priority: 10);
 };

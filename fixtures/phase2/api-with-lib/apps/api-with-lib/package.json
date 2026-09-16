@@ -1,0 +1,11 @@
+{
+  "name": "api-with-lib",
+  "private": true,
+  "dependencies": {
+    "shared-lib": "workspace:*"
+  },
+  "scripts": {
+    "build": "bun build.ts",
+    "start": "bun server.ts"
+  }
+}

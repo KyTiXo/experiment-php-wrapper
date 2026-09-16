@@ -60,14 +60,12 @@ final class HttpProxy
         $raw = curl_exec($ch);
         if ($raw === false) {
             $err = curl_error($ch);
-            curl_close($ch);
 
             return new ProxyResponse(502, [], $err, (int) ((hrtime(true) - $proxyStart) / 1_000_000));
         }
 
         $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $headerSize = (int) curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        curl_close($ch);
 
         $rawHeaders = substr($raw, 0, $headerSize);
         $responseBody = substr($raw, $headerSize);

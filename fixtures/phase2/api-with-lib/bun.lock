@@ -1,0 +1,24 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "api-with-lib-monorepo",
+    },
+    "apps/api-with-lib": {
+      "name": "api-with-lib",
+      "dependencies": {
+        "shared-lib": "workspace:*",
+      },
+    },
+    "packages/shared-lib": {
+      "name": "shared-lib",
+      "version": "1.0.0",
+    },
+  },
+  "packages": {
+    "api-with-lib": ["api-with-lib@workspace:apps/api-with-lib"],
+
+    "shared-lib": ["shared-lib@workspace:packages/shared-lib"],
+  }
+}
