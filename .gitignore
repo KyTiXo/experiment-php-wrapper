@@ -11,3 +11,4 @@
 *.pem
 credentials.json
 .DS_Store
+.jit-state-lib/
