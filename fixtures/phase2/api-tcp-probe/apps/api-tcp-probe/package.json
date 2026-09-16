@@ -1,0 +1,8 @@
+{
+  "name": "api-tcp-probe",
+  "private": true,
+  "scripts": {
+    "build": "bun build.ts",
+    "start": "bun server.ts"
+  }
+}

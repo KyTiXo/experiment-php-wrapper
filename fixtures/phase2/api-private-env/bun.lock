@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "api-private-env-monorepo",
+    },
+    "apps/api-private": {
+      "name": "api-private",
+    },
+  },
+  "packages": {
+    "api-private": ["api-private@workspace:apps/api-private"],
+  }
+}

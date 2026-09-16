@@ -22,18 +22,19 @@ Existing `fixture` keeps port **4100**.
 
 | Test | api-simple | api-with-lib | api-private |
 |------|------------|--------------|-------------|
-| T1   | pending    | pending      | pending     |
-| T2   | pending    | pending      | pending     |
-| T3   | pending    | pending      | pending     |
-| T4   | pending    | pending      | pending     |
-| T5   | pending    | pending      | pending     |
-| T6   | pending    | pending      | pending     |
-| T7   | pending    | pending      | pending     |
-| T8   | pending    | pending      | pending     |
-| T9   | pending    | pending      | pending     |
-| T10  | pending    | pending      | pending     |
-| T11  | pending    | pending      | pending     |
-| T12  | pending    | pending      | pending     |
+| T1   | pending    | pending      | **PASS**    |
+| T2   | pending    | pending      | **PASS**    |
+| T3   | pending    | pending      | **PASS**    |
+| T4   | pending    | pending      | **PASS**    |
+| T5   | pending    | pending      | **PASS**    |
+| T6   | pending    | pending      | **PASS**    |
+| T7   | pending    | pending      | **PASS**    |
+| T8   | pending    | pending      | **PASS**    |
+| T9   | pending    | pending      | **PASS**    |
+| T10  | pending    | pending      | **PASS**    |
+| T11  | pending    | pending      | **PASS**    |
+| T12  | pending    | pending      | **PASS** (via throwaway `api-tcp-probe`) |
+
 
 ---
 

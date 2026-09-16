@@ -102,8 +102,10 @@ final class Application
 
     private function isLocalRequest(): bool
     {
+        // T9: allow any port on localhost / 127.0.0.1 (host gateway e.g. :8092).
         $host = strtolower($_SERVER['HTTP_HOST'] ?? 'localhost');
-        if (!in_array($host, ['localhost', '127.0.0.1', 'localhost:8080', '127.0.0.1:8080'], true)) {
+        $hostname = explode(':', $host, 2)[0];
+        if (!in_array($hostname, ['localhost', '127.0.0.1'], true)) {
             return false;
         }
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

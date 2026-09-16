@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Starting api-private</title>
+<style nonce="32fecf22d0af40f6504aedb6fb4939bf">
+:root { color-scheme: dark; }
+body { background: #0d1117; color: #c9d1d9; font-family: ui-monospace, monospace; padding: 2rem; }
+h1 { font-size: 1.1rem; font-weight: 600; }
+.degraded { color: #d29922; }
+</style>
+</head>
+<body>
+<h1>JIT router · api-private</h1>
+<p>Building service…</p>
+<p id="state">Connecting…</p>
+<script nonce="32fecf22d0af40f6504aedb6fb4939bf">
+(function () {
+  const el = document.getElementById('state');
+  const es = new EventSource('/__dev/sse?service=api-private');
+  es.addEventListener('ready', function () { window.location.reload(); });
+  es.addEventListener('building', function () { el.textContent = 'Building…'; });
+  es.addEventListener('starting', function () { el.textContent = 'Starting…'; });
+  es.addEventListener('degraded', function () { el.textContent = 'Degraded (serving last good)'; el.className = 'degraded'; });
+  es.onerror = function () { el.textContent = 'Reconnecting…'; };
+})();
+</script>
+</body>
+</html>

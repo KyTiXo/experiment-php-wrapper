@@ -1,0 +1,3 @@
+{
+    "logs": "$ bun run --cwd apps\/api-private start\n$ bun server.ts\nlistening 4103\nerror: script \"start\" was terminated by signal SIGTERM (Polite quit request)\nerror: script \"start\" was terminated by signal SIGTERM (Polite quit request)\n$ bun run --cwd apps\/api-private start\n$ bun server.ts\nlistening 4103"
+}

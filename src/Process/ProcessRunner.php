@@ -116,25 +116,42 @@ final class ProcessRunner
 
     public function stop(PersistentProcess $proc, int $graceSec): int
     {
-        if (!is_resource($proc->resource)) {
-            return 0;
+        if (is_resource($proc->resource)) {
+            proc_terminate($proc->resource, 15);
+            $deadline = hrtime(true) + $graceSec * 1_000_000_000;
+
+            while (hrtime(true) < $deadline) {
+                $status = proc_get_status($proc->resource);
+                if (!$status['running']) {
+                    return proc_close($proc->resource);
+                }
+                usleep(100_000);
+            }
+
+            proc_terminate($proc->resource, 9);
+            usleep(100_000);
+
+            return proc_close($proc->resource);
         }
 
-        proc_terminate($proc->resource, 15);
-        $deadline = hrtime(true) + $graceSec * 1_000_000_000;
-
-        while (hrtime(true) < $deadline) {
-            $status = proc_get_status($proc->resource);
-            if (!$status['running']) {
-                return proc_close($proc->resource);
+        // Adopted PID from a prior PHP request — no proc_open handle in this process.
+        if ($proc->pid > 0 && function_exists('posix_kill')) {
+            if (!@posix_kill($proc->pid, 0)) {
+                return 0;
             }
+            posix_kill($proc->pid, 15);
+            $deadline = hrtime(true) + $graceSec * 1_000_000_000;
+            while (hrtime(true) < $deadline) {
+                if (!@posix_kill($proc->pid, 0)) {
+                    return 0;
+                }
+                usleep(100_000);
+            }
+            posix_kill($proc->pid, 9);
             usleep(100_000);
         }
 
-        proc_terminate($proc->resource, 9);
-        usleep(100_000);
-
-        return proc_close($proc->resource);
+        return 0;
     }
 
     /**

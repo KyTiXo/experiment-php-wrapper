@@ -1,0 +1,9 @@
+{
+  "name": "api-tcp-probe-monorepo",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "build": "bun run --cwd apps/api-tcp-probe build",
+    "start": "bun run --cwd apps/api-tcp-probe start"
+  }
+}

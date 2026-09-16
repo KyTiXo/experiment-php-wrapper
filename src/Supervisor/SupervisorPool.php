@@ -37,9 +37,9 @@ final class SupervisorPool
         foreach ($services as $service) {
             $this->supervisors[$service->name] = new ServiceSupervisor(
                 service: $service,
-                runner: $this->runner,
-                fingerprints: $this->fingerprints,
-                readiness: $this->readiness,
+                runner: $runner,
+                fingerprints: $fingerprints,
+                readiness: $readiness,
                 stateDir: $stateDir,
                 getEnv: $getEnvCallable,
             );

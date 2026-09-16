@@ -4,6 +4,8 @@
 /.php-cs-fixer.cache
 /var/
 /smoke/work/
+.jit-state-private/
+.jit-state*/
 .env
 .env.*
 !.env.example

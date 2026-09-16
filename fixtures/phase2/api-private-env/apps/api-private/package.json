@@ -1,0 +1,8 @@
+{
+  "name": "api-private",
+  "private": true,
+  "scripts": {
+    "build": "bun build.ts",
+    "start": "bun server.ts"
+  }
+}
