@@ -1,0 +1,1 @@
+{"method":"POST","path":"/echo","query":"?q=1&r=2","headers":{"accept":"application/json","content-length":"17","content-type":"application/json, application/json","host":"127.0.0.1:8092","user-agent":"curl/8.7.1","x-custom-a":"one, two","x-fixture-hook":"api-private"},"body":"{\"hello\":\"world\"}","hasDb":true}

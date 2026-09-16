@@ -69,5 +69,22 @@ return [
             ],
             'readyPath' => '/health',
         ],
+        // THROWAWAY Phase2 T12 — TCP readiness only (no readyPath). Port 4104.
+        'api-tcp-probe' => [
+            'dir' => 'fixtures/phase2/api-tcp-probe',
+            'port' => 4104,
+            'commands' => [
+                'build' => ['bun', 'run', 'build'],
+                'start' => ['bun', 'run', 'start'],
+            ],
+            'watch' => [
+                'fixtures/phase2/api-tcp-probe/apps/api-tcp-probe',
+            ],
+            'envPublic' => [
+                'PORT' => '4104',
+            ],
+            'envPrivate' => [],
+            // intentionally no readyPath — TCP connect suffices (T12)
+        ],
     ],
 ];

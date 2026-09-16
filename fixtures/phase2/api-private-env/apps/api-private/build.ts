@@ -9,13 +9,24 @@ Bun.serve({
   port,
   fetch(req) {
     const url = new URL(req.url);
+    const dbUrl = process.env.DATABASE_URL || '';
+
     if (url.pathname === '/health') {
-      const dbUrl = process.env.DATABASE_URL;
       if (!dbUrl) {
-        return Response.json({ ok: false, error: 'DATABASE_URL missing' }, { status: 503 });
+        return Response.json({ ok: false, error: 'DATABASE_URL required' }, { status: 503 });
       }
-      return Response.json({ ok: true, db: 'connected' });
+      // Mock connectivity: accept any non-empty URL (fake postgres:// is fine).
+      return Response.json({ ok: true, service: 'api-private', db: 'connected' });
     }
+
+    if (url.pathname === '/api/v1/ping') {
+      return Response.json({
+        pong: true,
+        service: 'api-private',
+        hasDb: Boolean(dbUrl),
+      });
+    }
+
     if (url.pathname === '/echo') {
       const headers = {};
       req.headers.forEach((v, k) => { headers[k] = v; });
@@ -25,8 +36,10 @@ Bun.serve({
         query: url.search,
         headers,
         body,
+        hasDb: Boolean(dbUrl),
       }));
     }
+
     return new Response('not found', { status: 404 });
   },
 });

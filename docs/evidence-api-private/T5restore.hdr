@@ -1,0 +1,7 @@
+HTTP/1.1 200 OK
+Host: 127.0.0.1:8092
+Date: Wed, 16 Sep 2026 03:02:09 GMT
+Connection: close
+X-Powered-By: PHP/8.5.8
+Content-Type: application/json; charset=UTF-8
+

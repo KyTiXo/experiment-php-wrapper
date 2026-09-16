@@ -16,4 +16,10 @@ return static function (HookRegistry $hooks): void {
 
         return $headers;
     }, priority: 10);
+
+    $hooks->register('service.api-private.request.headers', static function (array $headers): array {
+        $headers['X-Fixture-Hook'] = ['api-private'];
+
+        return $headers;
+    }, priority: 10);
 };

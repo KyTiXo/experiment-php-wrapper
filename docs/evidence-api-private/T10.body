@@ -1,0 +1,15 @@
+{
+    "name": "api-private",
+    "state": "stopped",
+    "dirty": false,
+    "buildId": null,
+    "coldStart": false,
+    "buildMs": null,
+    "stale": false,
+    "pid": null,
+    "fingerprint": null,
+    "envPublic": {
+        "PORT": "4103"
+    },
+    "lastError": null
+}

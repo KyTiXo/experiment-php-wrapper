@@ -4,6 +4,7 @@
 /.php-cs-fixer.cache
 /var/
 /smoke/work/
+.jit-state*/
 .env
 .env.*
 !.env.example
@@ -11,4 +12,3 @@
 *.pem
 credentials.json
 .DS_Store
-.jit-state-lib/
