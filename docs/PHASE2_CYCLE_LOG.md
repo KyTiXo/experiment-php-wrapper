@@ -38,3 +38,5 @@ Existing `fixture` keeps port **4100**.
 ---
 
 ## Cycle details
+
+- api-simple T1–T12 evidence: see `docs/PHASE2_EVIDENCE_api-simple.md` (branch `phase2/api-simple-matrix`).

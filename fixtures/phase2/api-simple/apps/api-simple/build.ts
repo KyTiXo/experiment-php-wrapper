@@ -34,5 +34,3 @@ console.log('listening', port);
 );
 
 console.log('built api-simple');
-
-// dirty-1789527489
