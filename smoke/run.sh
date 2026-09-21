@@ -7,6 +7,8 @@ cleanup() { rm -rf "$WORK"; }
 trap cleanup EXIT
 
 git init "$WORK" >/dev/null 2>&1
+git -C "$WORK" config user.email "jit-smoke@local"
+git -C "$WORK" config user.name "jit-smoke"
 cp -R "$ROOT/fixtures/bun-service" "$WORK/app"
 
 cat >"$WORK/services.php" <<'PHP'
